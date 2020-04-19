@@ -50,14 +50,70 @@ const winston = new Dog('Winston');
 
 // This seems pretty annoying right? What if we built this functionality ourselves? That's what this workshop is all about.
 
-// TODO: You'll have to create these two functions. Look in test/index.test.js to inspect the tests!
 class Factory {
   createClass(className, classObj, classSetters) {
+    const NewClass = class {
+      constructor(...args) {
+        Object.entries(classObj).forEach(([key, val]) => {
+          this[key] = val;
 
+          if (typeof this[key] === 'function') {
+            this[key].bind(this);
+          }
+        });
+
+        if (classSetters && typeof classSetters === 'object') {
+          Object.entries(classSetters).forEach(([key, val]) => {
+            this[key] = val(args);
+
+            if (typeof this[key] === 'function') {
+              this[key].bind(this);
+            }
+          });
+        }
+      }
+    }
+
+    Object.defineProperty(
+      NewClass,
+      'name',
+      { value: className },
+    );
+
+    return NewClass;
   }
 
   extendClass(ClassToExtend, className, classObj, classSetters) {
+    const NewClass = class extends ClassToExtend {
+      constructor(...args) {
+        super(...args);
+        Object.entries(classObj).forEach(([key, val]) => {
+          this[key] = val;
 
+          if (typeof this[key] === 'function') {
+            this[key].bind(this);
+          }
+        });
+
+        if (classSetters && typeof classSetters === 'object') {
+          Object.entries(classSetters).forEach(([key, val]) => {
+            this[key] = val(args);
+
+            if (typeof this[key] === 'function') {
+              this[key].bind(this);
+            }
+          });
+        }
+      }
+    }
+
+    Object.defineProperty(
+      NewClass,
+      'name',
+      { value: className },
+    );
+
+    return NewClass;
   }
 }
 
