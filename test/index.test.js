@@ -140,5 +140,113 @@ describe('Factory', () => {
 
       expect(winston.age).toEqual(2);
     });
+
+    it('shows that its prototype is an instance of Mammal', () => {
+      const Dog = theFactory.extendClass(
+        Mammal,
+        'Dog',
+        {
+          bark() {
+            console.log(`Bark. Woof. I am ${this.name} the ${this.breed} and I am ${this.age} years old. I also speak english fluently.`);
+          },
+        },
+        {
+          breed(constructorArgs) {
+            return constructorArgs[2];
+          },
+        }
+      );
+
+      expect(Dog.prototype instanceof Mammal).toBeTruthy();
+    });
+  });
+
+  describe('Bonus', () => {
+    let Mammal, Dog, clementine, winston;
+
+    beforeEach(() => {
+      Mammal = theFactory.createClass(
+        'Mammal',
+        {
+          milk() {
+            console.log('Milking sounds?');
+          },
+          birthday() {
+            ++this.age;
+          },
+        },
+        {
+          name(constructorArgs) {
+            return constructorArgs[0];
+          },
+          age(constructorArgs) {
+            return constructorArgs[1];
+          },
+        },
+      );
+
+      const puppyNames = [
+        'Bowser',
+        'Cisco',
+        'Lando',
+        'Fred',
+        'Barney',
+        'Bam Bam',
+        'Meatwad',
+      ];
+
+      const MAX_LITTER_SIZE = 5;
+
+      Dog = theFactory.extendClass(
+        Mammal,
+        'Dog',
+        {
+          bark() {
+            console.log(`Bark. Woof. I am ${this.name} the ${this.breed} and I am ${this.age} years old. I also speak english fluently.`);
+          },
+        },
+        {
+          breed(constructorArgs) {
+            return constructorArgs[2];
+          },
+        },
+        // TODO: Make this work if you are doing bonus.
+        {
+          haveLitter(breed) {
+            const copyOfNames = puppyNames.slice();
+            const litterSize = Math.ceil(Math.random() * MAX_LITTER_SIZE);
+
+            const bornPuppies = [];
+
+            for (let i = 0; i < litterSize; ++i) {
+              const randNameIdx = Math.floor(Math.random() * (copyOfNames.length - 1));
+              const [randName] = copyOfNames.splice(randNameIdx, 1);
+
+              bornPuppies.push(new Dog(randName, 0, breed));
+            }
+
+            return bornPuppies;
+          },
+        },
+      );
+
+      clementine = new Mammal('Clementine', 0);
+      winston = new Dog('Winston', 1, 'Australian Shepard');
+    });
+
+    it('has the proper name when inspecting a classes constructor', () => {
+      expect(clementine.constructor.name).toEqual('Mammal');
+      expect(winston.constructor.name).toEqual('Dog');
+    });
+
+    it('can accept an additional argument specifying static methods', () => {
+      const litter = Dog.haveLitter('Australian Shepard');
+
+      expect(litter.length).toBeGreaterThan(0);
+
+      litter.forEach((puppy) => {
+        expect(puppy instanceof Dog).toBeTruthy();
+      });
+    });
   });
 });

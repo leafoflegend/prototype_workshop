@@ -51,7 +51,7 @@ const winston = new Dog('Winston');
 // This seems pretty annoying right? What if we built this functionality ourselves? That's what this workshop is all about.
 
 class Factory {
-  createClass(className, classObj, classSetters) {
+  createClass(className, classObj, classSetters, classStaticObj) {
     const NewClass = class {
       constructor(...args) {
         Object.entries(classObj).forEach(([key, val]) => {
@@ -74,6 +74,12 @@ class Factory {
       }
     }
 
+    if (classStaticObj && typeof classStaticObj === 'object') {
+      Object.entries(classStaticObj).forEach(([key, val]) => {
+        NewClass[key] = val;
+      });
+    }
+
     Object.defineProperty(
       NewClass,
       'name',
@@ -83,7 +89,7 @@ class Factory {
     return NewClass;
   }
 
-  extendClass(ClassToExtend, className, classObj, classSetters) {
+  extendClass(ClassToExtend, className, classObj, classSetters, classStaticObj) {
     const NewClass = class extends ClassToExtend {
       constructor(...args) {
         super(...args);
@@ -105,6 +111,12 @@ class Factory {
           });
         }
       }
+    }
+
+    if (classStaticObj && typeof classStaticObj === 'object') {
+      Object.entries(classStaticObj).forEach(([key, val]) => {
+        NewClass[key] = val;
+      });
     }
 
     Object.defineProperty(
