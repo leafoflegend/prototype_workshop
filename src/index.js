@@ -54,6 +54,7 @@ class Factory {
   createClass(className, classObj, classSetters, classStaticObj) {
     const NewClass = class {
       constructor(...args) {
+        // TO BE CLEAR: The code below can be DRYed up since its reused everywhere. But to do so, makes it somewhat strange code to read (passing "this" contexts around). So I've opted for readability sake to not do so for you guys.
         Object.entries(classObj).forEach(([key, val]) => {
           this[key] = val;
 
